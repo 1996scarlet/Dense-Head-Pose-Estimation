@@ -128,3 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 draft/
+
+cmake-build-debug/
+.idea/
+data/
+
+rasterize.cpp
