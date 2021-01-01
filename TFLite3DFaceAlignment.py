@@ -8,29 +8,11 @@ from functools import partial
 import time
 
 
-class CoordinateAlignmentModel():
-    def __init__(self, model_path, bfm_path):
-        # tflite interpreter and helper functions init
-        self._tflite_init(model_path=model_path, num_threads=1)
-        self._trans_distance = self._input_shape[-1] / 2.0
-
-        # basel face model parameters init
-        self._basel_face_model_init(bfm_path)
-
-    def _basel_face_model_init(self, bfm_path):
-        bfm = np.load(bfm_path)
-
-        # dense mesh shape
-        self.u_base = bfm['u_base']
-        self.w_shp_base = bfm['w_shp_base']
-        self.w_exp_base = bfm['w_exp_base']
-
-        # offset matrix append
-        self._col = np.ones((1, len(self.u_base)//3))
-
-    def _tflite_init(self, **kwargs):
+class DenseFaceReconstruction():
+    def __init__(self, model_path, num_threads=1):
         # tflite model init
-        self._interpreter = tf.lite.Interpreter(**kwargs)
+        self._interpreter = tf.lite.Interpreter(model_path=model_path,
+                                                num_threads=num_threads)
         self._interpreter.allocate_tensors()
 
         # model details
@@ -39,12 +21,16 @@ class CoordinateAlignmentModel():
 
         # shape details
         self._input_shape = tuple(input_details[0]["shape"][-2:])
+        self._edge_size = self._input_shape[-1]
+        self._trans_distance = self._edge_size / 2.0
 
         # inference helper
         self._set_input_tensor = partial(self._interpreter.set_tensor,
                                          input_details[0]["index"])
-        self._get_output_tensor = partial(self._interpreter.get_tensor,
+        self._get_camera_matrix = partial(self._interpreter.get_tensor,
                                           output_details[0]["index"])
+        self._get_landmarks = partial(self._interpreter.get_tensor,
+                                      output_details[1]["index"])
 
     def _preprocessing(self, img, bbox, factor=2.7):
         """Pre-processing of the BGR image. Adopting warp affine for face corp.
@@ -65,7 +51,7 @@ class CoordinateAlignmentModel():
         """
 
         maximum_edge = max(bbox[2:4] - bbox[:2]) * factor
-        scale = self._trans_distance * 4.0 / maximum_edge
+        scale = self._edge_size * 2.0 / maximum_edge
         center = (bbox[2:4] + bbox[:2]) / 2.0
         cx, cy = self._trans_distance - scale * center
 
@@ -84,27 +70,19 @@ class CoordinateAlignmentModel():
         self._set_input_tensor(input_tensor)
         self._interpreter.invoke()
 
-        return self._get_output_tensor()[0]
+        return self._get_camera_matrix()[0], self._get_landmarks()[0]
 
-    def _postprocessing(self, out, M, trans_dim=12, exp_dim=10):
+    def _postprocessing(self, out, M):
         iM = cv2.invertAffineTransform(M)
 
-        R = out[:trans_dim].reshape(3, 4)
+        R, pts3d = out
         pose = cv2.decomposeProjectionMatrix(R)[-1]
 
-        alpha_shp = self.w_shp_base @ out[trans_dim:-exp_dim]
-        alpha_shp = out[trans_dim:-exp_dim] @ self.w_shp_base.T
-        alpha_exp = out[-exp_dim:] @ self.w_exp_base.T
-
-        F = (self.u_base + alpha_shp + alpha_exp)
-        F = F.reshape(3, -1, order='F')
-        F = np.concatenate((F, self._col))
-
-        pts3d = R @ F
-
         pts3d[0] -= 1
-        pts3d[1] -= 120
+        pts3d[1] -= self._edge_size
         pts3d[1] *= -1
+
+        # SAVE: deepth = pts3d[2]
         pts3d[2] = 1
 
         return (iM @ pts3d).T, pose
@@ -138,7 +116,7 @@ if __name__ == '__main__':
     import sys
 
     fd = UltraLightFaceDetecion("weights/RFB-320.tflite", conf_threshold=0.88)
-    fa = CoordinateAlignmentModel("weights/MB-120.tflite", "weights/bfm_68_landmarks.npz")
+    fa = DenseFaceReconstruction("weights/matrix_and_landmarks.tflite")
 
     cap = cv2.VideoCapture(sys.argv[1])
     color = (125, 255, 125)

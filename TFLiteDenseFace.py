@@ -32,10 +32,10 @@ class DenseFaceReconstruction():
         # inference helper
         self._set_input_tensor = partial(self._interpreter.set_tensor,
                                          input_details[0]["index"])
-        self._get_params = partial(self._interpreter.get_tensor,
-                                   output_details[0]["index"])
-        self._get_uv_shape = partial(self._interpreter.get_tensor,
-                                     output_details[1]["index"])
+        self._get_camera_matrix = partial(self._interpreter.get_tensor,
+                                          output_details[0]["index"])
+        self._get_landmarks = partial(self._interpreter.get_tensor,
+                                      output_details[1]["index"])
 
     def _preprocessing(self, img, bbox, factor=2.7):
         """Pre-processing of the BGR image. Adopting warp affine for face corp.
@@ -75,7 +75,7 @@ class DenseFaceReconstruction():
         self._set_input_tensor(input_tensor)
         self._interpreter.invoke()
 
-        return self._get_params()[0], self._get_uv_shape()[0]
+        return self._get_camera_matrix()[0], self._get_landmarks()[0]
 
     def _postprocessing(self, out, M):
         iM = cv2.invertAffineTransform(M)
@@ -86,6 +86,8 @@ class DenseFaceReconstruction():
         pts3d[0] -= 1
         pts3d[1] -= self._input_shape[0]
         pts3d[1] *= -1
+
+        # SAVE: deepth = pts3d[2]
         pts3d[2] = 1
 
         return (iM @ pts3d).T, pose
