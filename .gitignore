@@ -133,4 +133,5 @@ cmake-build-debug/
 .idea/
 data/
 
-rasterize.cpp
+rasterize.c
+.vscode/

@@ -1,6 +1,14 @@
 {
     "files.associations": {
         "*.rmd": "markdown",
-        "string": "cpp"
+        "new": "cpp",
+        "*.tcc": "cpp",
+        "chrono": "cpp",
+        "string_view": "cpp",
+        "algorithm": "cpp",
+        "random": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "numeric": "cpp"
     }
 }

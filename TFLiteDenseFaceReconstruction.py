@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     fd = UltraLightFaceDetecion("weights/RFB-320.tflite", conf_threshold=0.88)
     fa = TFLiteDenseFaceReconstruction("weights/dense_face.tflite")
-    rp = RenderPipeline("weights/triangles.npy")
+    render = RenderPipeline("weights/triangles.npy")
 
     cap = cv2.VideoCapture(sys.argv[1])
 
@@ -47,15 +47,13 @@ if __name__ == '__main__':
         if not ret:
             break
 
-        start_time = time.perf_counter()
-
         boxes, scores = fd.inference(frame)
 
         for landmarks, pose in fa.get_landmarks(frame, boxes):
             landmarks = landmarks.astype(np.float32)
-            rp(landmarks.T.copy(order='C'), frame)
-
-        print(time.perf_counter() - start_time)
+            start_time = time.perf_counter()
+            render(landmarks.T.copy(order='C'), frame)
+            print(time.perf_counter() - start_time)
 
         cv2.imshow("result", frame)
         if cv2.waitKey(0) == ord('q'):
