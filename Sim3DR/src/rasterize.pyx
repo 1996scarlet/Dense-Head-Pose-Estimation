@@ -6,34 +6,28 @@ cimport cython
 np.import_array()
 
 # cdefine the signature of our c function
-cdef extern from "rasterize_kernel.h":
-    void _rasterize(
-            unsigned char*image, float*vertices, int*triangles, float*colors,
-            int ntri, int h, int w, int c, float alpha
-    )
-
-    void _get_normal(float *vertices, int *triangles, int nver, int ntri)
+cdef extern from "render.h":
+    void _render(float *vertices, int nver, int *triangles, int ntri,
+                     float *light, float *directional, float *ambient,
+                     unsigned char*image, int h, int w, int c, float alpha)
 
 
 @cython.boundscheck(False)  # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
-def get_normal(np.ndarray[float, ndim=2, mode = "c"] vertices not None,
+def render(np.ndarray[float, ndim=2, mode = "c"] vertices not None,
+                   int nver, 
                    np.ndarray[int, ndim=2, mode="c"] triangles not None,
-                   int nver, int ntri):
-    _get_normal(
-        <float*> np.PyArray_DATA(vertices), <int*> np.PyArray_DATA(triangles),
-        nver, ntri)
-
-
-@cython.boundscheck(False)  # turn off bounds-checking for entire function
-@cython.wraparound(False)  # turn off negative index wrapping for entire function
-def rasterize(np.ndarray[unsigned char, ndim=3, mode = "c"] image not None,
-              np.ndarray[float, ndim=2, mode = "c"] vertices not None,
-              np.ndarray[int, ndim=2, mode="c"] triangles not None,
-              np.ndarray[float, ndim=2, mode = "c"] colors not None,
-              int ntri, int h, int w, int c, float alpha = 1):
-    _rasterize(
-        <unsigned char*> np.PyArray_DATA(image), <float*> np.PyArray_DATA(vertices),
-        <int*> np.PyArray_DATA(triangles),
-        <float*> np.PyArray_DATA(colors),
-        ntri, h, w, c, alpha)
+                   int ntri,
+                   np.ndarray[float, ndim=1, mode = "c"] light not None,
+                   np.ndarray[float, ndim=1, mode = "c"] directional not None,
+                   np.ndarray[float, ndim=1, mode = "c"] ambient not None,
+                   np.ndarray[unsigned char, ndim=3, mode = "c"] image not None,
+                   int h, int w, int c, float alpha = 1):
+    _render(
+        <float*> np.PyArray_DATA(vertices), nver,
+        <int*> np.PyArray_DATA(triangles), ntri,
+        <float*> np.PyArray_DATA(light),
+        <float*> np.PyArray_DATA(directional),
+        <float*> np.PyArray_DATA(ambient),
+        <unsigned char*> np.PyArray_DATA(image),
+        h, w, c, alpha)
