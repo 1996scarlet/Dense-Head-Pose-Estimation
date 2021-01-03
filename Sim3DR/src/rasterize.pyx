@@ -12,17 +12,16 @@ cdef extern from "rasterize_kernel.h":
             int ntri, int h, int w, int c, float alpha
     )
 
-    void _get_normal(float *ver_normal, float *vertices, int *triangles, int nver, int ntri)
+    void _get_normal(float *vertices, int *triangles, int nver, int ntri)
 
 
 @cython.boundscheck(False)  # turn off bounds-checking for entire function
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
-def get_normal(np.ndarray[float, ndim=2, mode = "c"] ver_normal not None,
-                   np.ndarray[float, ndim=2, mode = "c"] vertices not None,
+def get_normal(np.ndarray[float, ndim=2, mode = "c"] vertices not None,
                    np.ndarray[int, ndim=2, mode="c"] triangles not None,
                    int nver, int ntri):
     _get_normal(
-        <float*> np.PyArray_DATA(ver_normal), <float*> np.PyArray_DATA(vertices), <int*> np.PyArray_DATA(triangles),
+        <float*> np.PyArray_DATA(vertices), <int*> np.PyArray_DATA(triangles),
         nver, ntri)
 
 

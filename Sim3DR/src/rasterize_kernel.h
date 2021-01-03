@@ -1,10 +1,12 @@
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define max(x, y) (((x) > (y)) ? (x) : (y))
 #define min(x, y) (((x) < (y)) ? (x) : (y))
 
-struct Point{
+struct Point
+{
     float x;
     float y;
 };
@@ -12,12 +14,13 @@ struct Point{
 /*
  * Directly get normal of vertices, which can be regraded as a combination of _get_tri_normal and _get_ver_normal
  */
-void _get_normal(float *ver_normal, float *vertices, int *triangles, int nver, int ntri)
+void _get_normal(float *vertices, int *triangles, int nver, int ntri)
 {
     int tri_p0_ind, tri_p1_ind, tri_p2_ind;
     float v1x, v1y, v1z, v2x, v2y, v2z;
+    float resx, resy, resz;
 
-    float *tri_normal = (float *)malloc(3 * ntri * sizeof(float));
+    float *ver_normal = (float *)calloc(3 * nver, sizeof(float));
 
     for (int i = 0; i < ntri; i++)
     {
@@ -34,28 +37,28 @@ void _get_normal(float *ver_normal, float *vertices, int *triangles, int nver, i
         v2y = vertices[3 * tri_p2_ind + 1] - vertices[3 * tri_p0_ind + 1];
         v2z = vertices[3 * tri_p2_ind + 2] - vertices[3 * tri_p0_ind + 2];
 
-        tri_normal[3 * i] = v1y * v2z - v1z * v2y;
-        tri_normal[3 * i + 1] = v1z * v2x - v1x * v2z;
-        tri_normal[3 * i + 2] = v1x * v2y - v1y * v2x;
-    }
+        resx = v1y * v2z - v1z * v2y;
+        resy = v1z * v2x - v1x * v2z;
+        resz = v1x * v2y - v1y * v2x;
 
-    // get ver_normal
-    for (int i = 0; i < ntri; ++i)
-    {
-        tri_p0_ind = triangles[3 * i];
-        tri_p1_ind = triangles[3 * i + 1];
-        tri_p2_ind = triangles[3 * i + 2];
+        ver_normal[3 * tri_p0_ind] += resx;
+        ver_normal[3 * tri_p1_ind] += resx;
+        ver_normal[3 * tri_p2_ind] += resx;
 
-        for (int j = 0; j < 3; j++)
-        {
-            ver_normal[3 * tri_p0_ind + j] += tri_normal[3 * i + j];
-            ver_normal[3 * tri_p1_ind + j] += tri_normal[3 * i + j];
-            ver_normal[3 * tri_p2_ind + j] += tri_normal[3 * i + j];
-        }
+        ver_normal[3 * tri_p0_ind + 1] += resy;
+        ver_normal[3 * tri_p1_ind + 1] += resy;
+        ver_normal[3 * tri_p2_ind + 1] += resy;
+
+        ver_normal[3 * tri_p0_ind + 2] += resz;
+        ver_normal[3 * tri_p1_ind + 2] += resz;
+        ver_normal[3 * tri_p2_ind + 2] += resz;
     }
 
     // normalizing
     float nx, ny, nz, det;
+    float max_x=-1.0e8, max_y=-1.0e8, max_z=-1.0e8;
+    float min_x=1.0e8, min_y=1.0e8, min_z=1.0e8;
+    float mean_x=0.0, mean_y=0.0, mean_z=0.0;
     for (int i = 0; i < nver; ++i)
     {
         nx = ver_normal[3 * i];
@@ -65,12 +68,58 @@ void _get_normal(float *ver_normal, float *vertices, int *triangles, int nver, i
         det = sqrt(nx * nx + ny * ny + nz * nz);
         if (det <= 0)
             det = 1e-6;
-        ver_normal[3 * i] = nx / det;
-        ver_normal[3 * i + 1] = ny / det;
-        ver_normal[3 * i + 2] = nz / det;
+
+        ver_normal[3 * i] /= det;
+        ver_normal[3 * i + 1] /= det;
+        ver_normal[3 * i + 2] /= det;
+
+        mean_x += nx;
+        mean_y += ny;
+        mean_z += nz;
+
+        max_x = max(max_x, nx);
+        max_y = max(max_y, ny);
+        max_z = max(max_z, nz);
+
+        min_x = min(min_x, nx);
+        min_y = min(min_y, ny);
+        min_z = min(min_z, nz);
     }
 
-    free(tri_normal);
+    mean_x /= nver;
+    mean_y /= nver;
+    mean_z /= nver;
+
+    float light_pos_x=1.0, light_pos_y=1.0, light_pos_z=5.0;
+
+    for (int i = 0; i < nver; ++i){
+        vertices[3 * i] -= mean_x;
+        vertices[3 * i] /= max_x - min_x;
+
+        vertices[3 * i + 1] -= mean_y;
+        vertices[3 * i + 1] /= max_y - min_y;
+
+        vertices[3 * i + 2] -= mean_z;
+        vertices[3 * i + 2] /= max_z - min_z;
+
+        nx = light_pos_x - vertices[3 * i];
+        ny = light_pos_y - vertices[3 * i + 1];
+        nz = light_pos_z - vertices[3 * i + 2];
+
+        det = sqrt(nx * nx + ny * ny + nz * nz);
+        if (det <= 0)
+            det = 1e-6;
+        
+        vertices[3 * i] = nx / det;
+        vertices[3 * i + 1] = ny / det;
+        vertices[3 * i + 2] = nz / det;
+
+        vertices[3 * i] *= ver_normal[3 * i];
+        vertices[3 * i + 1] *=  ver_normal[3 * i + 1];
+        vertices[3 * i + 2] *= ver_normal[3 * i + 2];
+    }
+
+    free(ver_normal);
 }
 
 // rasterization by Z-Buffer with optimization
@@ -86,9 +135,9 @@ void _rasterize(
     float p_depth, p0_depth, p1_depth, p2_depth;
     float p_color, p0_color, p1_color, p2_color;
     float weight[3];
+    float inverDeno, u, v;
 
     float *depth_buffer = (float *)malloc(h * w * sizeof(float));
-    ;
 
     for (int i = 0; i < ntri; ++i)
     {
@@ -99,9 +148,11 @@ void _rasterize(
         p0.x = vertices[3 * tri_p0_ind];
         p0.y = vertices[3 * tri_p0_ind + 1];
         p0_depth = vertices[3 * tri_p0_ind + 2];
+        
         p1.x = vertices[3 * tri_p1_ind];
         p1.y = vertices[3 * tri_p1_ind + 1];
         p1_depth = vertices[3 * tri_p1_ind + 2];
+
         p2.x = vertices[3 * tri_p2_ind];
         p2.y = vertices[3 * tri_p2_ind + 1];
         p2_depth = vertices[3 * tri_p2_ind + 2];
@@ -128,22 +179,21 @@ void _rasterize(
                 v2.x = x - p0.x;
                 v2.y = y - p0.y;
 
-                // dot products
-                float dot00 = v0.x * v0.x + v0.y * v0.y; //np.dot(v0.T, v0)
-                float dot01 = v0.x * v1.x + v0.y * v1.y; //np.dot(v0.T, v1)
-                float dot02 = v0.x * v2.x + v0.y * v2.y; //np.dot(v0.T, v2)
-                float dot11 = v1.x * v1.x + v1.y * v1.y; //np.dot(v1.T, v1)
-                float dot12 = v1.x * v2.x + v1.y * v2.y; //np.dot(v1.T, v2)
+                // dot products np.dot(v0.T, v0)
+                float dot00 = v0.x * v0.x + v0.y * v0.y;
+                float dot01 = v0.x * v1.x + v0.y * v1.y;
+                float dot02 = v0.x * v2.x + v0.y * v2.y;
+                float dot11 = v1.x * v1.x + v1.y * v1.y;
+                float dot12 = v1.x * v2.x + v1.y * v2.y;
 
                 // barycentric coordinates
-                float inverDeno;
                 if (dot00 * dot11 - dot01 * dot01 == 0)
                     inverDeno = 0;
                 else
                     inverDeno = 1 / (dot00 * dot11 - dot01 * dot01);
 
-                float u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
-                float v = (dot00 * dot12 - dot01 * dot02) * inverDeno;
+                u = (dot11 * dot02 - dot01 * dot12) * inverDeno;
+                v = (dot00 * dot12 - dot01 * dot02) * inverDeno;
 
                 // weight
                 weight[0] = 1 - u - v;
