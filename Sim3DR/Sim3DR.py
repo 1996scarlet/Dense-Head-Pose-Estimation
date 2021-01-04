@@ -12,10 +12,10 @@ class RenderPipeline(object):
         self._triangles = np.load(file_path)
         self._tri_nums = self._triangles.shape[0]
 
-    def __call__(self, vertices, bg, alpha=1):
+    def __call__(self, vertices, bg):
         Sim3DR_Cython.render(vertices, vertices.shape[0],
                              self._triangles, self._tri_nums,
                              self._light,
                              self._directional,
                              self._ambient,
-                             bg, *bg.shape, alpha)
+                             bg, *bg.shape)
