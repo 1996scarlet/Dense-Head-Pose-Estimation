@@ -1,4 +1,6 @@
-# coding: utf-8
+#!/usr/bin/python3
+# -*- coding:utf-8 -*-
+
 import numpy as np
 import ctypes
 
@@ -9,9 +11,8 @@ class TrianglesMeshRender():
                  clibs,
                  triangles,
                  light=[1, 1, 5],
-                 direction=[0.5, 0.5, 0.6],
-                 ambient=[0.3, 0.4, 0.5]):
-
+                 direction=[0.6, 0.6, 0.6],
+                 ambient=[0.6, 0.5, 0.4]):
 
         self._clibs = ctypes.CDLL(clibs)
 

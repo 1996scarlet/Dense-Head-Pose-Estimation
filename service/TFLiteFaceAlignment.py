@@ -99,7 +99,44 @@ class BaseTFLiteFaceAlignment():
         """
 
         for box in detected_faces:
+            if box[2] - box[0] < 29: continue
             inp, M = self._preprocessing(image, box)
             self._inference(inp)
 
             yield self._postprocessing(M)
+
+
+class DenseFaceReconstruction(BaseTFLiteFaceAlignment):
+    def __init__(self, model_path, num_threads=1):
+        super().__init__(model_path, num_threads)
+
+    def _decode_landmarks(self, iM):
+        pts3d = self._get_landmarks()[0]
+
+        pts3d[0] -= 1
+        pts3d[1] -= self._edge_size
+        pts3d[1] *= -1
+
+        deepth = pts3d[2:].copy()
+
+        pts3d[2] = 1
+        pts3d = iM @ pts3d
+
+        deepth -= 1
+        deepth *= iM[0][0] * 2
+        deepth -= np.min(deepth)
+        return np.concatenate((pts3d, deepth), axis=0)
+
+class DepthFacialLandmarks(BaseTFLiteFaceAlignment):
+    def __init__(self, model_path, num_threads=1):
+        super().__init__(model_path, num_threads)
+
+    def _decode_landmarks(self, iM):
+        pts3d = self._get_landmarks()[0]
+
+        pts3d[0] -= 1
+        pts3d[1] -= self._edge_size
+        pts3d[1] *= -1
+        pts3d[2] = 1
+
+        return (iM @ pts3d).T
