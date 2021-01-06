@@ -13,15 +13,15 @@ struct Tuple3D
     float z;
 };
 
-void _render(const float *vertices,
-             const int nver,
-             const int *triangles,
+void _render(const int *triangles,
              const int ntri,
              const float *light,
              const float *directional,
              const float *ambient,
+             const float *vertices,
+             const int nver,
              unsigned char *image,
-             const int h, const int w, const int c)
+             const int h, const int w)
 {
     int tri_p0_ind, tri_p1_ind, tri_p2_ind;
     int color_index;

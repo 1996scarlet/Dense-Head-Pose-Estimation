@@ -39,9 +39,9 @@ if __name__ == '__main__':
         if not ret:
             break
 
-        start_time = time.perf_counter()
-
         boxes, scores = fd.inference(frame)
+
+        start_time = time.perf_counter()
 
         for landmarks, pose in fa.get_landmarks(frame, boxes):
             print(pose.flatten())

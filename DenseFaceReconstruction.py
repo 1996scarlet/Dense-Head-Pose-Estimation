@@ -5,7 +5,7 @@ import numpy as np
 from BaseTFLiteFaceAlignment import BaseTFLiteFaceAlignment
 
 
-class TFLiteDenseFaceReconstruction(BaseTFLiteFaceAlignment):
+class DenseFaceReconstruction(BaseTFLiteFaceAlignment):
     def __init__(self, model_path, num_threads=1):
         super().__init__(model_path, num_threads)
 
@@ -32,12 +32,12 @@ if __name__ == '__main__':
     import cv2
     import time
 
-    from Sim3DR import RenderPipeline
+    from CtypesMeshRender import TrianglesMeshRender
     from TFLiteFaceDetector import UltraLightFaceDetecion
 
     fd = UltraLightFaceDetecion("weights/RFB-320.tflite", conf_threshold=0.88)
-    fa = TFLiteDenseFaceReconstruction("weights/dense_face.tflite")
-    render = RenderPipeline("weights/triangles.npy")
+    fa = DenseFaceReconstruction("weights/dense_face.tflite")
+    mr = TrianglesMeshRender("asset/render.so", "asset/triangles.npy")
 
     cap = cv2.VideoCapture(sys.argv[1])
 
@@ -51,8 +51,9 @@ if __name__ == '__main__':
 
         for landmarks, pose in fa.get_landmarks(frame, boxes):
             landmarks = landmarks.astype(np.float32)
+            
             start_time = time.perf_counter()
-            render(landmarks.T.copy(order='C'), frame)
+            mr.render(landmarks.T.copy(), frame)
             print(time.perf_counter() - start_time)
 
         cv2.imshow("result", frame)
