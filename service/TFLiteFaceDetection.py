@@ -10,8 +10,7 @@ class UltraLightFaceDetecion():
                  nms_max_output_size=200, nms_iou_threshold=0.3) -> None:
 
         self._feature_maps = np.array([[40, 30], [20, 15], [10, 8], [5, 4]])
-        self._min_boxes = np.array([[10, 16, 24], [32, 48],
-                                    [64, 96], [128, 192, 256]])
+        self._min_boxes = [[10, 16, 24], [32, 48], [64, 96], [128, 192, 256]]
 
         self._resize = partial(cv2.resize, dsize=input_size)
         self._input_size = np.array(input_size)[:, None]
@@ -43,7 +42,6 @@ class UltraLightFaceDetecion():
     def _generate_anchors(self):
         anchors = []
         for feature_map_w_h, min_box in zip(self._feature_maps, self._min_boxes):
-
             wh_grid = min_box / self._input_size
             wh_grid = np.tile(wh_grid.T, (np.prod(feature_map_w_h), 1))
 

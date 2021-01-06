@@ -1,15 +1,21 @@
 # Dense Head Pose Estimation: Towards Fast, Accurate and Stable 3D Dense Face Alignment
 
+<p align="center"><img src="https://s3.ax1x.com/2021/01/06/sZVyhq.gif" /></p>
+
 [ECCV 2020] Reimplementation of "Towards Fast, Accurate and Stable 3D Dense Face Alignment", face mesh, head pose, landmarks, and more.
 
-## Facial Landmarkss
+## Setup
 
-``` bash
-python3 TFLite3DFaceAlignment.py <your-video-path>
+Build render.
+
+```bash
+bash build_render.sh
 ```
 
 ## Face Reconstruction
 
 ``` bash
-python3 DenseFaceReconstruction.py ~/boris.avi
+python3 video_speed_benchmark.py <your-video-path>
 ```
+
+![HeadPoseLogo](https://s3.ax1x.com/2021/01/06/sZV0BQ.jpg)
