@@ -10,7 +10,7 @@ Reimplementation of [(ECCV 2020) Towards Fast, Accurate and Stable 3D Dense Face
 
 * CPU real-time face deteciton, alignment, and reconstruction pipeline.
 * Lightweight render library, 5x faster (3ms vs 15ms) than the [Sim3DR](https://github.com/cleardusk/3DDFA_V2/tree/master/Sim3DR) tools.
-* Camera matrix and dense/sprase landmarks prediction via a single network.
+* Camera matrix and dense/sparse landmarks prediction via a single network.
 * Generate facial parameters for robust head pose and expression estimation.
 
 ## Setup
@@ -24,7 +24,7 @@ Reimplementation of [(ECCV 2020) Towards Fast, Accurate and Stable 3D Dense Face
 
 * GCC 6.0+
 * `bash build_render.sh`
-* (Cautios) For Windows user, please refer to [Stack Overflow Questions](https://stackoverflow.com/questions/1130479/how-to-build-a-dll-from-the-command-line-in-windows-using-msvc) for more details.
+* (Cautios) For Windows user, please refer to [this tutorial](https://stackoverflow.com/questions/1130479/how-to-build-a-dll-from-the-command-line-in-windows-using-msvc) for more details.
 
 ## 3D Facial Landmarks
 
