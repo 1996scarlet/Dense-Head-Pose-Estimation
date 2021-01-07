@@ -24,13 +24,29 @@ Reimplementation of [(ECCV 2020) Towards Fast, Accurate and Stable 3D Dense Face
 
 * GCC 6.0+
 * `bash build_render.sh`
-* (Cautios) For Windows user, please refer to [this tutorial](https://stackoverflow.com/questions/1130479/how-to-build-a-dll-from-the-command-line-in-windows-using-msvc) for more details.
+* (Cautious) For Windows user, please refer to [this tutorial](https://stackoverflow.com/questions/1130479/how-to-build-a-dll-from-the-command-line-in-windows-using-msvc) for more details.
 
 ## 3D Facial Landmarks
+
+68--sparse
+
+``` bash
+python3 demo_video.py -m sparse -f <your-video-path>
+```
+
+38365--dense
+
+``` bash
+python3 demo_video.py -m dense -f <your-video-path>
+```
 
 ## Head Pose and Expression
 
 ## Face Mesh Reconstruction
+
+``` bash
+python3 demo_video.py -m mesh -f <your-video-path>
+```
 
 | Scheme | THREAD=1 | THREAD=2 | THREAD=4 |
 | :-: | :-: | :-: | :-: |
