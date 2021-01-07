@@ -14,10 +14,7 @@ fa = service.DenseFaceReconstruction("weights/dense_face.tflite")
 mr = service.TrianglesMeshRender("asset/render.so", "asset/triangles.npy")
 
 cap = cv2.VideoCapture(sys.argv[1])
-cap.set(cv2.CAP_PROP_POS_FRAMES, 760)
-
-counter = 0
-rate = cap.get(5)
+counter, rate = 0, cap.get(5)
 
 while True:
     ret, frame = cap.read()
@@ -38,7 +35,7 @@ while True:
     for landmarks, pose in fa.get_landmarks(feed, boxes):
         landmarks = landmarks.astype(np.float32)
         mr.render(landmarks.T.copy(), frame)
-
+    
     recon_cost = time.perf_counter() - start_time
 
     if counter % rate == 0:
@@ -48,9 +45,6 @@ while True:
 
     counter += 1
 
-    # frame = frame[:400, 200:1080, :]
-
     cv2.imshow("result", frame)
-    # cv2.imwrite(f'./draft/gif/img{counter:0>3}.png', frame)
     if cv2.waitKey(1) == ord('q'):
         break

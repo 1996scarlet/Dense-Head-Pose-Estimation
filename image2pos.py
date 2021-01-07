@@ -15,8 +15,6 @@ frame = cv2.imread(sys.argv[1])
 
 boxes, scores = fd.inference(frame)
 
-# boxes = boxes[::-1]
-
 feed = frame.copy()
 
 for landmarks, pose in fa.get_landmarks(feed, boxes):

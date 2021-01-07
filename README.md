@@ -1,21 +1,58 @@
 # Dense Head Pose Estimation: Towards Fast, Accurate and Stable 3D Dense Face Alignment
 
-<p align="center"><img src="https://s3.ax1x.com/2021/01/06/sZVyhq.gif" /></p>
+![FaceReconstructionDemo](https://s3.ax1x.com/2021/01/06/sZVyhq.gif)
 
-[ECCV 2020] Reimplementation of "Towards Fast, Accurate and Stable 3D Dense Face Alignment", face mesh, head pose, landmarks, and more.
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/1996scarlet/Dense-Head-Pose-Estimation.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/1996scarlet/Dense-Head-Pose-Estimation/context:python)
+[![License](https://badgen.net/github/license/1996scarlet/Dense-Head-Pose-Estimation)](LICENSE)
+[![ECCV](https://badgen.net/badge/ECCV/2020/red)](https://www.ecva.net/papers/eccv_2020/papers_ECCV/html/3162_ECCV_2020_paper.php)
+
+Reimplementation of [3DDFA_V2 (ECCV 2020)](https://github.com/cleardusk/3DDFA_V2) via Tensorflow Lite framework, face mesh, head pose, landmarks, and more.
+
+* CPU real-time face deteciton, alignment, and reconstruction pipeline.
+* Lightweight render library, 5x faster (3ms vs 15ms) than the [Sim3DR](https://github.com/cleardusk/3DDFA_V2/tree/master/Sim3DR) tools.
+* Camera matrix and dense/sprase landmarks prediction via a single network.
+* Generate facial parameters for robust head pose and expression estimation.
 
 ## Setup
 
-Build render.
+### Basic Requirements
 
-```bash
-bash build_render.sh
-```
+* Python 3.6+
+* `pip3 install -r requirements.txt`
 
-## Face Reconstruction
+### Render for Dense Face
+
+* GCC 6.0+
+* `bash build_render.sh`
+* (Cautios) For Windows user, please refer to [Stack Overflow Questions](https://stackoverflow.com/questions/1130479/how-to-build-a-dll-from-the-command-line-in-windows-using-msvc) for more details.
+
+## 3D Facial Landmarks
+
+## Head Pose and Expression
+
+## Face Mesh Reconstruction
+
+| Scheme | THREAD=1 | THREAD=2 | THREAD=4 |
+| :-: | :-: | :-: | :-: |
+| Inference  | 7.79ms  | 6.88ms | 5.83ms |
 
 ``` bash
 python3 video_speed_benchmark.py <your-video-path>
 ```
 
+| Stage | Preprocess | Inference | Postprocess | Render |
+| :-: | :-: | :-: | :-: | :-: |
+| Each face cost  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
+
 ![HeadPoseLogo](https://s3.ax1x.com/2021/01/06/sZV0BQ.jpg)
+
+## Citation
+
+``` bibtex
+@inproceedings{guo2020towards,
+    title={Towards Fast, Accurate and Stable 3D Dense Face Alignment},
+    author={Guo, Jianzhu and Zhu, Xiangyu and Yang, Yang and Yang, Fan and Lei, Zhen and Li, Stan Z},
+    booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
+    year={2020}
+}
+```
