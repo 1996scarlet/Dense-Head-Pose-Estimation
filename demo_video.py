@@ -25,7 +25,7 @@ def draw_poly(frame, landmarks, color=(128, 255, 255), thickness=1):
 
 def main(args, color=(224, 255, 255)):
     fd = service.UltraLightFaceDetecion("weights/RFB-320.tflite",
-                                        conf_threshold=0.92)
+                                        conf_threshold=0.96)
 
     if args.mode in ["sparse", "pose"]:
         fa = service.DepthFacialLandmarks("weights/sparse_face.tflite")
