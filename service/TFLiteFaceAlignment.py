@@ -126,6 +126,7 @@ class DenseFaceReconstruction(BaseTFLiteFaceAlignment):
         deepth -= np.min(deepth)
         return np.concatenate((pts3d, deepth), axis=0)
 
+
 class DepthFacialLandmarks(BaseTFLiteFaceAlignment):
     def __init__(self, model_path, num_threads=1):
         super().__init__(model_path, num_threads)

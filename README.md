@@ -28,13 +28,29 @@ Reimplementation of [(ECCV 2020) Towards Fast, Accurate and Stable 3D Dense Face
 
 ## 3D Facial Landmarks
 
-68--sparse
+In this project, we perform dense face reconstruction by predicting 3DMM parameters, including 12 camera coordinate parameters, 40 shape parameters, and 10 expression parameters.
+Mapping these parameters to a predefined 3D model (such as BFM) can complete the task of sparse or dense face anchor prediction.
+At present, our method supports up to the prediction of the coordinates of 38365 face anchor points.
+
+<!-- 我们通过预测3DMM参数的方式来进行稠密的人脸重建, 具体包括12个相机坐标参数, 40个形状参数以及10个表情参数. -->
+<!-- 将这些参数映射到预定义的三维模型中(例如BFM), 就可以完成稀疏或稠密人脸锚点预测任务. -->
+<!-- 目前, 我们的方法最高支持预测38365个人脸锚点的坐标. -->
+
+### Sparse
+
+<p align="center">
+  <img alt="sparse demo" src="https://s3.ax1x.com/2021/01/09/sMaBwT.gif">
+</p>
 
 ``` bash
 python3 demo_video.py -m sparse -f <your-video-path>
 ```
 
-38365--dense
+### Dense
+
+<p align="center">
+  <img alt="dense demo" src="https://s3.ax1x.com/2021/01/09/sQ01VP.gif">
+</p>
 
 ``` bash
 python3 demo_video.py -m dense -f <your-video-path>
