@@ -40,20 +40,19 @@ More specifically, the following formula describes how to generate a face throug
 
 where **U** and **W** are from pre-defined face model.
 Combine them linearly with parameters to generate sparse or dense faces.
-Finally, we need to integrate the pose parameters **C**, into the result:
+Finally, we need to integrate the posture information into the result:
 
 <p align="center">
   <img alt="With matrix" src="https://latex.codecogs.com/svg.latex?F=R\cdot%20F+T">
 </p>
 
-where **R** (shape 3x3) and **T** (shape 3x1) denote rotation and translation matrices, respectively, which are fractured from **C**.
+where **R** (shape of 3x3) and **T** (shape of 3x1) denote rotation and translation matrices, respectively, which are fractured from the camera matrix **C**.
 
 ### Sparse
 
 <p align="center">
   <img alt="sparse demo" src="https://s3.ax1x.com/2021/01/09/sMaBwT.gif">
 </p>
-
 
 ``` bash
 python3 demo_video.py -m sparse -f <your-video-path>
