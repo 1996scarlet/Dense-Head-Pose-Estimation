@@ -54,6 +54,12 @@ where **R** (shape of 3x3) and **T** (shape of 3x1) denote rotation and translat
   <img alt="sparse demo" src="https://s3.ax1x.com/2021/01/10/slO9je.gif">
 </p>
 
+Since we have reconstructed the entire face, the 3D face alignment can be achieved by selecting the landmarks at the corresponding positions. See [[TPAMI 2017] Face alignment in full pose range: A 3d total solution](https://arxiv.org/abs/1804.01005) for more details.
+
+Comparing with the method of first detecting 2D landmarks and then performing depth estimation, directly fitting 3DMM to solve 3D face alignment can not only obtain more accurate results in larger pose scenes, but also has obvious advantages in speed.
+
+We provide a demonstration script that can generate 68 landmarks based on the reconstructed face. Run the following command to view the real-time 3D face alignment results:
+
 ``` bash
 python3 demo_video.py -m sparse -f <your-video-path>
 ```
