@@ -51,7 +51,7 @@ where **R** (shape of 3x3) and **T** (shape of 3x1) denote rotation and translat
 ### Sparse
 
 <p align="center">
-  <img alt="sparse demo" src="https://s3.ax1x.com/2021/01/09/sMaBwT.gif">
+  <img alt="sparse demo" src="https://s3.ax1x.com/2021/01/10/slO9je.gif">
 </p>
 
 ``` bash
