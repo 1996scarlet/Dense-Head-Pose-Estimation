@@ -28,15 +28,32 @@ Reimplementation of [(ECCV 2020) Towards Fast, Accurate and Stable 3D Dense Face
 
 ## 3D Facial Landmarks
 
-In this project, we perform dense face reconstruction by 3DMM parameters regression. The regression target is simplified as camera matrix (T, shape of 3x4), appearance parameters (S, shape of 1x40), and expression variables (E, shape of 1x10), with 62 dimensions in total.
+In this project, we perform dense face reconstruction by 3DMM parameters regression.
+The regression target is simplified as camera matrix (**C**, shape of 3x4), appearance parameters (**S**, shape of 1x40), and expression variables (**E**, shape of 1x10), with 62 dimensions in total.
 
-Sparse or dense facial landmarks can be estimated by applying these parameters to a predefined 3D model, such as [BFM](https://faces.dmi.unibas.ch/bfm/main.php?nav=1-1-0&id=details). Currently, our method supports up to 38,365 landmarks.
+The sparse or dense facial landmarks can be estimated by applying these parameters to a predefined 3D model, such as [BFM](https://faces.dmi.unibas.ch/bfm/main.php?nav=1-1-0&id=details).
+More specifically, the following formula describes how to generate a face through parameters:
+
+<p align="center">
+  <img alt="Generate Face" src="https://latex.codecogs.com/svg.latex?F=U_{base}+S\cdot%20W_{shp}+E\cdot%20W_{exp}">
+</p>
+
+where **U** and **W** are from pre-defined face model.
+Combine them linearly with parameters to generate sparse or dense faces.
+Finally, we need to integrate the pose parameters **C**, into the result:
+
+<p align="center">
+  <img alt="With matrix" src="https://latex.codecogs.com/svg.latex?F=R\cdot%20F+T">
+</p>
+
+where **R** (shape 3x3) and **T** (shape 3x1) denote rotation and translation matrices, respectively, which are fractured from **C**.
 
 ### Sparse
 
 <p align="center">
   <img alt="sparse demo" src="https://s3.ax1x.com/2021/01/09/sMaBwT.gif">
 </p>
+
 
 ``` bash
 python3 demo_video.py -m sparse -f <your-video-path>
@@ -47,6 +64,10 @@ python3 demo_video.py -m sparse -f <your-video-path>
 <p align="center">
   <img alt="dense demo" src="https://s3.ax1x.com/2021/01/09/sQ01VP.gif">
 </p>
+
+Currently, our method supports up to 38,365 landmarks.
+We draw landmarks every 6 indexes for a better illustration.
+Run the demonstrate script in **dense** mode for real-time dense facial landmark localization:
 
 ``` bash
 python3 demo_video.py -m dense -f <your-video-path>
