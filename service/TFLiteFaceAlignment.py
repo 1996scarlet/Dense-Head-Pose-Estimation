@@ -106,9 +106,6 @@ class BaseTFLiteFaceAlignment():
 
 
 class DenseFaceReconstruction(BaseTFLiteFaceAlignment):
-    def __init__(self, model_path, num_threads=1):
-        super().__init__(model_path, num_threads)
-
     def _decode_landmarks(self, iM):
         pts3d = self._get_landmarks()[0]
 
@@ -128,9 +125,6 @@ class DenseFaceReconstruction(BaseTFLiteFaceAlignment):
 
 
 class DepthFacialLandmarks(BaseTFLiteFaceAlignment):
-    def __init__(self, model_path, num_threads=1):
-        super().__init__(model_path, num_threads)
-
     def _decode_landmarks(self, iM):
         pts3d = self._get_landmarks()[0]
 
