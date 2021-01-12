@@ -76,11 +76,10 @@ class BaseTFLiteFaceAlignment():
         iM = cv2.invertAffineTransform(M)
 
         R = self._get_camera_matrix()[0]
-        pose = cv2.decomposeProjectionMatrix(R)[-1]
 
         landmarks = self._decode_landmarks(iM)
 
-        return landmarks, pose
+        return landmarks, R
 
     def get_landmarks(self, image, detected_faces=None):
         """Predict the landmarks for each face present in the image.
