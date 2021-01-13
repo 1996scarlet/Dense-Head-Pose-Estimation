@@ -37,7 +37,7 @@ def main(args, color=(224, 255, 255)):
             handler(frame, results, color)
 
         cv2.imshow("demo", frame)
-        if cv2.waitKey(1) == ord("q"):
+        if cv2.waitKey(0) == ord("q"):
             break
 
 

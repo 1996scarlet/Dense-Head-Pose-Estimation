@@ -6,43 +6,65 @@ from .TFLiteFaceAlignment import DenseFaceReconstruction, DepthFacialLandmarks
 from .CtypesMeshRender import TrianglesMeshRender
 
 
-def build_camera_box(rear_size=9e4, factor=4/3):
+def decode_params(params):
+    R1 = params[0:1, :3]
+    R2 = params[1:2, :3]
+    t3d = params[:, -1:]
+
+    # liner normalize
+    r1 = R1 / np.linalg.norm(R1)
+    r2 = R2 / np.linalg.norm(R2)
+    r3 = np.cross(r1, r2)
+
+    # rotate matrix
+    R = np.concatenate((r1, r2, r3), axis=0)
+
+    # projection matrix
+    P = np.concatenate((R, t3d), axis=1)
+    euler = cv2.decomposeProjectionMatrix(P)[-1]
+
+    return R, euler
+
+
+def build_camera_box(rear_size, factor=np.sqrt(2)):
     rear_depth = 0
     front_size = front_depth = int(factor * rear_size)
 
     point_3d = np.array([
-        [-rear_size, -rear_size, rear_depth, 1],
-        [-rear_size, rear_size, rear_depth, 1],
-        [rear_size, rear_size, rear_depth, 1],
-        [rear_size, -rear_size, rear_depth, 1],
-        [-rear_size, -rear_size, rear_depth, 1],
-        [-front_size, -front_size, front_depth, 1],
-        [-front_size, front_size, front_depth, 1],
-        [front_size, front_size, front_depth, 1],
-        [front_size, -front_size, front_depth, 1],
-        [-front_size, -front_size, front_depth, 1]
+        [-rear_size, -rear_size, rear_depth],
+        [-rear_size, rear_size, rear_depth],
+        [rear_size, rear_size, rear_depth],
+        [rear_size, -rear_size, rear_depth],
+        [-rear_size, -rear_size, rear_depth],
+        [-front_size, -front_size, front_depth],
+        [-front_size, front_size, front_depth],
+        [front_size, front_size, front_depth],
+        [front_size, -front_size, front_depth],
+        [-front_size, -front_size, front_depth]
     ], dtype=np.float32)
 
     return point_3d
 
 
-def plot_pose_box(img, P, ver, color, line_width=2):
-    point_3d = build_camera_box()
+def draw_projection(frame, R, ver, color, thickness=2):
+    radius = np.max(np.max(ver, 0) - np.min(ver, 0)) / 2
+    offset = np.mean(ver[:27], 0)
 
-    P[1] *= -1
-    point_2d = point_3d @ P[:2].T
+    point_3d = build_camera_box(radius)
 
-    point_2d = point_2d - np.mean(point_2d[:4], 0) + np.mean(ver[:27], 0)
-    point_2d = point_2d.astype(np.int32)
+    R = R[:2]
+    R[1] *= -1
 
-    # Draw all the lines
-    cv2.polylines(img, [point_2d], True, color, line_width, cv2.LINE_AA)
-    cv2.line(img, tuple(point_2d[1]), tuple(
-        point_2d[6]), color, line_width, cv2.LINE_AA)
-    cv2.line(img, tuple(point_2d[2]), tuple(
-        point_2d[7]), color, line_width, cv2.LINE_AA)
-    cv2.line(img, tuple(point_2d[3]), tuple(
-        point_2d[8]), color, line_width, cv2.LINE_AA)
+    point_2d = point_3d @ R.T + offset
+    points = point_2d.astype(np.int32)
+
+    cv2.polylines(frame, [points], True, color, thickness, cv2.LINE_AA)
+    cv2.line(frame, tuple(points[1]), tuple(points[6]),
+             color, thickness, cv2.LINE_AA)
+    cv2.line(frame, tuple(points[2]), tuple(points[7]),
+             color, thickness, cv2.LINE_AA)
+    cv2.line(frame, tuple(points[3]), tuple(points[8]),
+             color, thickness, cv2.LINE_AA)
 
 
 def draw_poly(frame, landmarks, color=(128, 255, 255), thickness=1):
@@ -81,11 +103,10 @@ def mesh(frame, results, color):
 
 
 def pose(frame, results, color):
-    landmarks, camera_matrix = results
+    landmarks, params = results
 
-    # K, rot_mat, trans_vec, _, _, _, euler = cv2.decomposeProjectionMatrix(camera_matrix)
-    # rot_vec = cv2.Rodrigues(rot_mat)
+    R, euler = decode_params(params)
 
-    plot_pose_box(frame, camera_matrix, landmarks, color)
+    draw_projection(frame, R, landmarks, color)
 
-    # print(K, camera_matrix)
+    print(euler.flatten())
