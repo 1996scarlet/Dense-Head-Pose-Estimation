@@ -80,6 +80,12 @@ python3 demo_video.py -m dense -f <your-video-path>
 
 ## Head Pose and Expression
 
+![Head Pose](https://s3.ax1x.com/2021/01/14/sdfSJI.gif)
+
+``` bash
+python3 demo_video.py -m pose -f <your-video-path>
+```
+
 ## Face Mesh Reconstruction
 
 ``` bash

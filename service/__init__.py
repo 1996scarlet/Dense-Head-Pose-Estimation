@@ -26,7 +26,7 @@ def decode_params(params):
 
 def build_projection_matrix(rear_size, factor=np.sqrt(2)):
     rear_depth = 0
-    front_size = front_depth = int(factor * rear_size)
+    front_size = front_depth = factor * rear_size
 
     projections = np.array([
         [-rear_size, -rear_size, rear_depth],
@@ -46,7 +46,7 @@ def draw_projection(frame, R, landmarks, color, thickness=2):
     # build projection matrix
     radius = np.max(np.max(landmarks, 0) - np.min(landmarks, 0)) / 2
     projections = build_projection_matrix(radius)
-    
+
     # refine rotate matrix
     rotate_matrix = R[:2]
     rotate_matrix[1] *= -1
