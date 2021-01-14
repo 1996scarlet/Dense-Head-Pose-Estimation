@@ -7,64 +7,61 @@ from .CtypesMeshRender import TrianglesMeshRender
 
 
 def decode_params(params):
-    R1 = params[0:1, :3]
-    R2 = params[1:2, :3]
-    t3d = params[:, -1:]
+    # rotate matrix
+    R = params[:3, :3].copy()
 
     # liner normalize
-    r1 = R1 / np.linalg.norm(R1)
-    r2 = R2 / np.linalg.norm(R2)
-    r3 = np.cross(r1, r2)
-
-    # rotate matrix
-    R = np.concatenate((r1, r2, r3), axis=0)
+    R[:2] /= np.linalg.norm(R[:2], axis=1, keepdims=True)
+    R[2] = np.cross(R[0], R[1])
 
     # projection matrix
-    P = np.concatenate((R, t3d), axis=1)
+    P = params.copy()
+    P[:3, :3] = R.T
+
+    # decompose
     euler = cv2.decomposeProjectionMatrix(P)[-1]
 
     return R, euler
 
 
-def build_camera_box(rear_size, factor=np.sqrt(2)):
+def build_projection_matrix(rear_size, factor=np.sqrt(2)):
     rear_depth = 0
     front_size = front_depth = int(factor * rear_size)
 
-    point_3d = np.array([
+    projections = np.array([
         [-rear_size, -rear_size, rear_depth],
         [-rear_size, rear_size, rear_depth],
         [rear_size, rear_size, rear_depth],
         [rear_size, -rear_size, rear_depth],
-        [-rear_size, -rear_size, rear_depth],
         [-front_size, -front_size, front_depth],
         [-front_size, front_size, front_depth],
         [front_size, front_size, front_depth],
         [front_size, -front_size, front_depth],
-        [-front_size, -front_size, front_depth]
     ], dtype=np.float32)
 
-    return point_3d
+    return projections
 
 
-def draw_projection(frame, R, ver, color, thickness=2):
-    radius = np.max(np.max(ver, 0) - np.min(ver, 0)) / 2
-    offset = np.mean(ver[:27], 0)
+def draw_projection(frame, R, landmarks, color, thickness=2):
+    # build projection matrix
+    radius = np.max(np.max(landmarks, 0) - np.min(landmarks, 0)) / 2
+    projections = build_projection_matrix(radius)
+    
+    # refine rotate matrix
+    rotate_matrix = R[:2]
+    rotate_matrix[1] *= -1
 
-    point_3d = build_camera_box(radius)
+    # 3D -> 2D
+    center = np.mean(landmarks[:27], axis=0)
+    points = projections @ rotate_matrix.T + center
+    points = points.astype(np.int32)
 
-    R = R[:2]
-    R[1] *= -1
-
-    point_2d = point_3d @ R.T + offset
-    points = point_2d.astype(np.int32)
-
-    cv2.polylines(frame, [points], True, color, thickness, cv2.LINE_AA)
-    cv2.line(frame, tuple(points[1]), tuple(points[6]),
-             color, thickness, cv2.LINE_AA)
-    cv2.line(frame, tuple(points[2]), tuple(points[7]),
-             color, thickness, cv2.LINE_AA)
-    cv2.line(frame, tuple(points[3]), tuple(points[8]),
-             color, thickness, cv2.LINE_AA)
+    # draw poly
+    cv2.polylines(frame, np.take(points, [
+        [0, 1], [1, 2], [2, 3], [3, 0],
+        [0, 4], [1, 5], [2, 6], [3, 7],
+        [4, 5], [5, 6], [6, 7], [7, 4]
+    ], axis=0), False, color, thickness, cv2.LINE_AA)
 
 
 def draw_poly(frame, landmarks, color=(128, 255, 255), thickness=1):
@@ -105,8 +102,8 @@ def mesh(frame, results, color):
 def pose(frame, results, color):
     landmarks, params = results
 
+    # rotate matrix and euler angle
     R, euler = decode_params(params)
+    print(f"Pitch: {euler[0]}; Yaw: {euler[1]}; Roll: {euler[2]};")
 
     draw_projection(frame, R, landmarks, color)
-
-    print(euler.flatten())
