@@ -86,6 +86,12 @@ python3 demo_video.py -m dense -f <your-video-path>
 python3 demo_video.py -m pose -f <your-video-path>
 ```
 
+![Expression](https://s3.ax1x.com/2021/01/06/sZV0BQ.jpg)
+
+``` bash
+python3 demo_image.py <your-image-path>
+```
+
 ## Face Mesh Reconstruction
 
 ``` bash
@@ -103,8 +109,6 @@ python3 video_speed_benchmark.py <your-video-path>
 | Stage | Preprocess | Inference | Postprocess | Render |
 | :-: | :-: | :-: | :-: | :-: |
 | Each face cost  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
-
-![HeadPoseLogo](https://s3.ax1x.com/2021/01/06/sZV0BQ.jpg)
 
 ## Citation
 
