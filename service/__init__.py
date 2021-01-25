@@ -6,22 +6,22 @@ from .TFLiteFaceAlignment import DenseFaceReconstruction, DepthFacialLandmarks
 from .CtypesMeshRender import TrianglesMeshRender
 
 
-def decode_params(params):
-    # rotate matrix
-    R = params[:3, :3].copy()
+def rotationMatrixToEulerAngles(R):
+    '''
+    Ref: https://stackoverflow.com/a/15029416
+    '''
+    sy = np.sqrt(R[0, 0] ** 2 + R[1, 0] ** 2)
 
-    # liner normalize
-    R[:2] /= np.linalg.norm(R[:2], axis=1, keepdims=True)
-    R[2] = np.cross(R[0], R[1])
+    if sy < 1e-6:
+        x = np.arctan2(-R[1, 2], R[1, 1])
+        y = np.arctan2(-R[2, 0], sy)
+        z = 0
+    else:
+        x = np.arctan2(R[2, 1], R[2, 2])
+        y = np.arctan2(-R[2, 0], sy)
+        z = np.arctan2(R[1, 0], R[0, 0])
 
-    # projection matrix
-    P = params.copy()
-    P[:3, :3] = R.T
-
-    # decompose
-    euler = cv2.decomposeProjectionMatrix(P)[-1]
-
-    return R, euler
+    return np.degrees([x, y, z])
 
 
 def build_projection_matrix(rear_size, factor=np.sqrt(2)):
@@ -44,16 +44,16 @@ def build_projection_matrix(rear_size, factor=np.sqrt(2)):
 
 def draw_projection(frame, R, landmarks, color, thickness=2):
     # build projection matrix
-    radius = np.max(np.max(landmarks, 0) - np.min(landmarks, 0)) / 2
+    radius = np.max(np.max(landmarks, 0) - np.min(landmarks, 0)) // 2
     projections = build_projection_matrix(radius)
 
     # refine rotate matrix
-    rotate_matrix = R[:2]
-    rotate_matrix[1] *= -1
+    rotate_matrix = R[:, :2]
+    rotate_matrix[:, 1] *= -1
 
     # 3D -> 2D
     center = np.mean(landmarks[:27], axis=0)
-    points = projections @ rotate_matrix.T + center
+    points = projections @ rotate_matrix + center
     points = points.astype(np.int32)
 
     # draw poly
@@ -102,8 +102,11 @@ def mesh(frame, results, color):
 def pose(frame, results, color):
     landmarks, params = results
 
-    # rotate matrix and euler angle
-    R, euler = decode_params(params)
+    # rotate matrix
+    R = params[:3, :3].copy()
+
+    # decompose matrix to ruler angle
+    euler = rotationMatrixToEulerAngles(R)
     print(f"Pitch: {euler[0]}; Yaw: {euler[1]}; Roll: {euler[2]};")
 
     draw_projection(frame, R, landmarks, color)
