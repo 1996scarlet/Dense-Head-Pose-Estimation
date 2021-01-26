@@ -1,4 +1,4 @@
-# Dense Head Pose Estimation: Towards Fast, Accurate and Stable 3D Dense Face Alignment
+# Stable Head Pose Estimation via 3D Dense Face Reconstruction
 
 ![FaceReconstructionDemo](https://s3.ax1x.com/2021/01/06/sZVyhq.gif)
 
