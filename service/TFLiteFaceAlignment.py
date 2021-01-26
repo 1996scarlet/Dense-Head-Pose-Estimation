@@ -106,25 +106,19 @@ class BaseTFLiteFaceAlignment():
 
 class DenseFaceReconstruction(BaseTFLiteFaceAlignment):
     def _decode_landmarks(self, iM):
-        pts3d = self._get_landmarks()[0]
+        points = self._get_landmarks()[0]
 
-        pts3d[0] -= 1
-        pts3d[1] -= self._edge_size
-        pts3d[1] *= -1
+        points *= iM[0][0]
+        points[:, :2] += iM[:, -1]
 
-        deepth = pts3d[2:].copy()
-
-        pts3d[2] = 1
-        pts3d = iM @ pts3d
-
-        deepth -= 1
-        deepth *= iM[0][0] * 2
-        deepth -= np.min(deepth)
-        return np.concatenate((pts3d, deepth), axis=0)
+        return points
 
 
 class DepthFacialLandmarks(BaseTFLiteFaceAlignment):
     def _decode_landmarks(self, iM):
         points = self._get_landmarks()[0]
 
-        return points * iM[0, 0] + iM[:, -1]
+        points *= iM[0, 0]
+        points += iM[:, -1]
+
+        return points
