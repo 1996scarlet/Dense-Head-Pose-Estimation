@@ -34,7 +34,7 @@ while True:
 
     for landmarks, pose in fa.get_landmarks(feed, boxes):
         landmarks = landmarks.astype(np.float32)
-        mr.render(landmarks.T.copy(), frame)
+        mr.render(landmarks.copy(), frame)
     
     recon_cost = time.perf_counter() - start_time
 

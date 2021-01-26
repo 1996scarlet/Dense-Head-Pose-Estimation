@@ -19,7 +19,7 @@ feed = frame.copy()
 
 for landmarks, pose in fa.get_landmarks(feed, boxes):
     landmarks = landmarks.astype(np.float32)
-    mr.render(landmarks.T.copy(), frame)
+    mr.render(landmarks.copy(), frame)
 
 cv2.imshow("result", frame)
 cv2.waitKey(0)
