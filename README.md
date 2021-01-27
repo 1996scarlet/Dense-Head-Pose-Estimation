@@ -78,21 +78,61 @@ Run the demonstrate script in **dense** mode for real-time dense facial landmark
 python3 demo_video.py -m dense -f <your-video-path>
 ```
 
-## Head Pose and Expression
+## Face Reconstruction
+
+Our network is multi-task since it can directly regress 3DMM params from a single face image for reconstruction as well as estimating the head pose via **R** and **T** prediction.
+
+During training, the
+
+### Head Pose
 
 ![Head Pose](https://s3.ax1x.com/2021/01/14/sdfSJI.gif)
+
+Traditional head pose estimation approaches, such as [Appearance Template Models](https://www.researchgate.net/publication/2427763_Face_Recognition_by_Support_Vector_Machines), [Detector Arrays](https://ieeexplore.ieee.org/document/609310), and [Mainfold Embedding](https://ieeexplore.ieee.org/document/4270305) have been extensively studied.
+However, until recent years, methods based on deep learning finally improved the prediction accuracy to meet actual needs.
+
+Given a set of predefined 3D facial landmarks and the corresponding 2D image projections, the SolvePnP tool can be utilized to calculate the rotation matrix.
+However, the adopted mean 3D human face model usually introduces intrinsic error during the fitting process.
+Meanwhile, the additional landmarks extraction component is also kind of cumbersome.
+
+<!-- 6DoF
+
+R 提供了3个自由度pitch, raw, roll; T提供了另外3个x, y, z
+
+与原始模型不同的是, 我们的模型能够为输入的每张人脸图像直接预测其旋转矩阵R和平移矩阵T, 以及稠密或稀疏的特征点.
+
+区别于先预测特征点,再基于先验3D模型并使用SolvePNP估计R和T的方法, 通过神经网络直接输出相机矩阵的方法有更强的泛化性以
+
+直接预测相机矩阵的方法能够显著降低网络训练成本,
+
+| Method | Yaw | Pitch | Roll | MAE |
+| :-: | :-: | :-: | :-: | :-: |
+| 3DDFA_V1  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
+| 3DDFA_V2  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
+| FSA-Net  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
+| Ours  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms | -->
 
 ``` bash
 python3 demo_video.py -m pose -f <your-video-path>
 ```
 
+### Expression
+
 ![Expression](https://s3.ax1x.com/2021/01/06/sZV0BQ.jpg)
+
+<!-- As
+
+由于我们的方法能够预测稠密的人脸特征点以及姿态信息,
+
+因此也可以进行粗略的表情估计, -->
+
+Run the `demo_image.py` script for expression rederring:
 
 ``` bash
 python3 demo_image.py <your-image-path>
 ```
 
-## Face Mesh Reconstruction
+### Mesh
 
 ``` bash
 python3 demo_video.py -m mesh -f <your-video-path>
