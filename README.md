@@ -82,14 +82,21 @@ python3 demo_video.py -m dense -f <your-video-path>
 
 Our network is multi-task since it can directly regress 3DMM params from a single face image for reconstruction as well as estimating the head pose via **R** and **T** prediction.
 
-During training, the
+During training, the predicted **R** can supervise the params regression branch to generate more precise pose parameters.
+Meanwhile, the landmarks calculated via the params are provided as the labeled data to the pose estimation branch for training, through the SolvePnP tool.
+
+<!-- 整个网络的头部姿态估计任务本质上是半监督的, 只需要少量的初始化带标签数据即可激活整个训练过程
+
+我们的方法结合了
+
+不仅利用了PNP, 并且通过动态拟合3d模型避免了先验模型精度较低所导致的姿态估计不准的问题 -->
 
 ### Head Pose
 
 ![Head Pose](https://s3.ax1x.com/2021/01/14/sdfSJI.gif)
 
 Traditional head pose estimation approaches, such as [Appearance Template Models](https://www.researchgate.net/publication/2427763_Face_Recognition_by_Support_Vector_Machines), [Detector Arrays](https://ieeexplore.ieee.org/document/609310), and [Mainfold Embedding](https://ieeexplore.ieee.org/document/4270305) have been extensively studied.
-However, until recent years, methods based on deep learning finally improved the prediction accuracy to meet actual needs.
+However, methods based on deep learning improved the prediction accuracy to meet actual needs, until recent years.
 
 Given a set of predefined 3D facial landmarks and the corresponding 2D image projections, the SolvePnP tool can be utilized to calculate the rotation matrix.
 However, the adopted mean 3D human face model usually introduces intrinsic error during the fitting process.
