@@ -80,16 +80,26 @@ python3 demo_video.py -m dense -f <your-video-path>
 
 ## Face Reconstruction
 
-Our network is multi-task since it can directly regress 3DMM params from a single face image for reconstruction as well as estimating the head pose via **R** and **T** prediction.
+Our network is multi-task since it can directly regress 3DMM params from a single face image for reconstruction, as well as estimate the head pose via **R** and **T** prediction.
 
-During training, the predicted **R** can supervise the params regression branch to generate more precise pose parameters.
-Meanwhile, the landmarks calculated via the params are provided as the labeled data to the pose estimation branch for training, through the SolvePnP tool.
+During training, the predicted **R** can supervise the params regression branch to generate more precise face mesh.
+Meanwhile, the landmarks calculated via the params are provided as the labeled data to the pose estimation branch for training, through the `cv2.solvePnP` tool.
 
-<!-- 整个网络的头部姿态估计任务本质上是半监督的, 只需要少量的初始化带标签数据即可激活整个训练过程
+The head pose estimation task in our model is weakly supervised, since only a few labeled data is required to activate the training process.
+In detail, the loss function at the initial stage can be described as follows:
 
-我们的方法结合了
+<p align="center">
+  <img alt="Init Pose Loss" src="https://latex.codecogs.com/svg.latex?L_{pose}=L_{2}(R_{gt},R_{pose})+L_{2}(R_{gt},R_{params})">
+</p>
 
-不仅利用了PNP, 并且通过动态拟合3d模型避免了先验模型精度较低所导致的姿态估计不准的问题 -->
+After the initialization process, the ground truth can be replaced by the prediction results of other branches.
+Therefore, the loss function will be transformed to the following equation in the later stage of the training process:
+
+<p align="center">
+  <img alt="Pose Loss" src="https://latex.codecogs.com/svg.latex?L_{pose}=2\cdot%20L_{2}(R_{params},R_{pose})">
+</p>
+
+In general, fitting the 3D model during the training process dynamically can avoid the inaccurate head pose estimation results caused by the coarse predefined model.
 
 ### Head Pose
 
