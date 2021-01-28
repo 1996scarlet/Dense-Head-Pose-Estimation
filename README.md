@@ -81,11 +81,10 @@ python3 demo_video.py -m dense -f <your-video-path>
 ## Face Reconstruction
 
 Our network is multi-task since it can directly regress 3DMM params from a single face image for reconstruction, as well as estimate the head pose via **R** and **T** prediction.
-
-During training, the predicted **R** can supervise the params regression branch to generate more precise face mesh.
+During training, the predicted **R** can supervise the params regression branch to generate refined face mesh.
 Meanwhile, the landmarks calculated via the params are provided as the labeled data to the pose estimation branch for training, through the `cv2.solvePnP` tool.
 
-The head pose estimation task in our model is weakly supervised, since only a few labeled data is required to activate the training process.
+Theoretically speaking, the head pose estimation task in our model is weakly supervised, since only a few labeled data is required to activate the training process.
 In detail, the loss function at the initial stage can be described as follows:
 
 <p align="center">
@@ -112,15 +111,12 @@ Given a set of predefined 3D facial landmarks and the corresponding 2D image pro
 However, the adopted mean 3D human face model usually introduces intrinsic error during the fitting process.
 Meanwhile, the additional landmarks extraction component is also kind of cumbersome.
 
+Therefore, we designed a network branch for directly regress **6DoF** parameters from the face image.
+The predictions include the 3DoF rotation matrix **R** (Pitch, Yaw, Roll), and the 3DoF translation matrix **T** (x, y, z),
+Compared with the landmark-based method, directly regression the camera matrix is more robust and stable, as well as significantly reduce the network training cost.
+Run the demonstrate script in **pose** mode to view the real-time head pose estimation results:
+
 <!-- 6DoF
-
-R 提供了3个自由度pitch, raw, roll; T提供了另外3个x, y, z
-
-与原始模型不同的是, 我们的模型能够为输入的每张人脸图像直接预测其旋转矩阵R和平移矩阵T, 以及稠密或稀疏的特征点.
-
-区别于先预测特征点,再基于先验3D模型并使用SolvePNP估计R和T的方法, 通过神经网络直接输出相机矩阵的方法有更强的泛化性以
-
-直接预测相机矩阵的方法能够显著降低网络训练成本,
 
 | Method | Yaw | Pitch | Roll | MAE |
 | :-: | :-: | :-: | :-: | :-: |
