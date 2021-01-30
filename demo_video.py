@@ -8,7 +8,7 @@ import cv2
 
 def main(args, color=(224, 255, 255)):
     fd = service.UltraLightFaceDetecion("weights/RFB-320.tflite",
-                                        conf_threshold=0.98)
+                                        conf_threshold=0.95)
 
     if args.mode in ["sparse", "pose"]:
         fa = service.DepthFacialLandmarks("weights/sparse_face.tflite")
@@ -21,11 +21,20 @@ def main(args, color=(224, 255, 255)):
     handler = getattr(service, args.mode)
     cap = cv2.VideoCapture(args.filepath)
 
+    # print(cap.get(3), cap.get(4))
+    # exit(0)
+
+    counter = 0
+
     while True:
         ret, frame = cap.read()
 
         if not ret:
             break
+
+        counter += 1
+
+        frame = frame[:, 160:1120, :].copy()
 
         # face detection
         boxes, scores = fd.inference(frame)
@@ -36,7 +45,7 @@ def main(args, color=(224, 255, 255)):
         for results in fa.get_landmarks(feed, boxes):
             handler(frame, results, color)
 
-        # cv2.imwrite(f'draft/gif/fish/img{counter:0>4}.jpg', frame)
+        cv2.imwrite(f'draft/gif/trans/img{counter:0>4}.jpg', frame)
 
         cv2.imshow("demo", frame)
         if cv2.waitKey(1) == ord("q"):

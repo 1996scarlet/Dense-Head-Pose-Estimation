@@ -102,7 +102,9 @@ In general, fitting the 3D model during the training process dynamically can avo
 
 ### Head Pose
 
-![Head Pose](https://s3.ax1x.com/2021/01/14/sdfSJI.gif)
+<p align="center">
+  <img alt="pose demo" src="https://s3.ax1x.com/2021/01/14/sdfSJI.gif">
+</p>
 
 Traditional head pose estimation approaches, such as [Appearance Template Models](https://www.researchgate.net/publication/2427763_Face_Recognition_by_Support_Vector_Machines), [Detector Arrays](https://ieeexplore.ieee.org/document/609310), and [Mainfold Embedding](https://ieeexplore.ieee.org/document/4270305) have been extensively studied.
 However, methods based on deep learning improved the prediction accuracy to meet actual needs, until recent years.
@@ -133,23 +135,32 @@ python3 demo_video.py -m pose -f <your-video-path>
 
 ![Expression](https://s3.ax1x.com/2021/01/06/sZV0BQ.jpg)
 
-<!-- As
+Coarse expression estimation can be achieved by combining the predefined expressions in BFM linearly.
+In our model, regression the **E** is one of the tasks of the params prediction branch.
+Obviously, the accuracy of the linear combination is positively related to the dimension.
 
-由于我们的方法能够预测稠密的人脸特征点以及姿态信息,
-
-因此也可以进行粗略的表情估计, -->
-
+Clipping parameters can accelerate the training process, however, it can also reduce reconstruction accuracy, especially details such as eye and mouth.
+More specifically, **E** has a greater impact on face details than **S** when emotion is involved.
+Therefore, we choose 10-dimension for a tradeoff between the speed and the accuracy.
 Run the `demo_image.py` script for expression rederring:
 
 ``` bash
 python3 demo_image.py <your-image-path>
 ```
 
+For refining the expression predictions, please follow [3DDFA](https://github.com/cleardusk/3DDFA#training-details) to prepare the training data.
+
 ### Mesh
+
+<p align="center">
+  <img alt="mesh demo" src="https://s3.ax1x.com/2021/01/30/ykCWEd.gif">
+</p>
 
 ``` bash
 python3 demo_video.py -m mesh -f <your-video-path>
 ```
+
+## Benchmark
 
 | Scheme | THREAD=1 | THREAD=2 | THREAD=4 |
 | :-: | :-: | :-: | :-: |
