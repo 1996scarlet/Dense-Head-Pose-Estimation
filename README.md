@@ -118,8 +118,7 @@ The predictions include the 3DoF rotation matrix **R** (Pitch, Yaw, Roll), and t
 Compared with the landmark-based method, directly regression the camera matrix is more robust and stable, as well as significantly reduce the network training cost.
 Run the demonstrate script in **pose** mode to view the real-time head pose estimation results:
 
-<!-- 6DoF
-
+<!--
 | Method | Yaw | Pitch | Roll | MAE |
 | :-: | :-: | :-: | :-: | :-: |
 | 3DDFA_V1  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
@@ -141,20 +140,24 @@ Obviously, the accuracy of the linear combination is positively related to the d
 
 Clipping parameters can accelerate the training process, however, it can also reduce reconstruction accuracy, especially details such as eye and mouth.
 More specifically, **E** has a greater impact on face details than **S** when emotion is involved.
-Therefore, we choose 10-dimension for a tradeoff between the speed and the accuracy.
-Run the `demo_image.py` script for expression rederring:
+Therefore, we choose 10-dimension for a tradeoff between the speed and the accuracy, the training data can be found at [here](https://github.com/cleardusk/3DDFA#training-details) for refinement.
+
+In addition, we provide a simple facial expression rendering script. Run the following command for illustration:
 
 ``` bash
 python3 demo_image.py <your-image-path>
 ```
-
-For refining the expression predictions, please follow [3DDFA](https://github.com/cleardusk/3DDFA#training-details) to prepare the training data.
 
 ### Mesh
 
 <p align="center">
   <img alt="mesh demo" src="https://s3.ax1x.com/2021/01/30/ykCWEd.gif">
 </p>
+
+According to the predefined BFM and the predicted 3DMM parameters, the dense 3D facial landmarks can be easily calculated.
+On this basis, the mesh can be obtained via the index mapping between the triangle vertices and the dense landmarks defined in BFM.
+Finally, the reconstruction results can be previewed by plotting these triangles through the renderer.
+Run the demonstrate script in **mesh** mode for real-time facial reconstruction:
 
 ``` bash
 python3 demo_video.py -m mesh -f <your-video-path>
