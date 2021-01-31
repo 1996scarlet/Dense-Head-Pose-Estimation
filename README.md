@@ -118,14 +118,6 @@ The predictions include the 3DoF rotation matrix **R** (Pitch, Yaw, Roll), and t
 Compared with the landmark-based method, directly regression the camera matrix is more robust and stable, as well as significantly reduce the network training cost.
 Run the demonstrate script in **pose** mode to view the real-time head pose estimation results:
 
-<!--
-| Method | Yaw | Pitch | Roll | MAE |
-| :-: | :-: | :-: | :-: | :-: |
-| 3DDFA_V1  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
-| 3DDFA_V2  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
-| FSA-Net  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
-| Ours  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms | -->
-
 ``` bash
 python3 demo_video.py -m pose -f <your-video-path>
 ```
@@ -155,9 +147,8 @@ python3 demo_image.py <your-image-path>
 </p>
 
 According to the predefined BFM and the predicted 3DMM parameters, the dense 3D facial landmarks can be easily calculated.
-On this basis, the mesh can be obtained via the index mapping between the triangle vertices and the dense landmarks defined in BFM.
-Finally, the reconstruction results can be previewed by plotting these triangles through the renderer.
-Run the demonstrate script in **mesh** mode for real-time facial reconstruction:
+On this basis, through the index mapping between the morphable triangle vertices and the dense landmarks defined in BFM, the renderer can plot these geometries with depth infomation for mesh preview.
+Run the demonstrate script in **mesh** mode for real-time face reconstruction:
 
 ``` bash
 python3 demo_video.py -m mesh -f <your-video-path>
@@ -165,17 +156,26 @@ python3 demo_video.py -m mesh -f <your-video-path>
 
 ## Benchmark
 
+Our network can directly output the camera matrix and sparse or dense landmarks.
+Compared with the model in the original paper with the same backbone, the additional parameters yield via the pose regression branch does not significantly affect the inference speed, which means it can still be CPU real-time.
+
 | Scheme | THREAD=1 | THREAD=2 | THREAD=4 |
 | :-: | :-: | :-: | :-: |
 | Inference  | 7.79ms  | 6.88ms | 5.83ms |
 
-``` bash
-python3 video_speed_benchmark.py <your-video-path>
-```
+In addition, since most of the operations are wrapped in the model, the time consumption of pre-processing and post-processing are significantly reduced.
+Meanwhile, the optimized lightweight renderer is 5x faster (3ms vs 15ms) than the [Sim3DR](https://github.com/cleardusk/3DDFA_V2/tree/master/Sim3DR) tools.
+These measures decline the latency of the entire pipeline.
 
 | Stage | Preprocess | Inference | Postprocess | Render |
 | :-: | :-: | :-: | :-: | :-: |
 | Each face cost  | 0.23ms  | 7.79ms | 0.39ms | 3.92ms |
+
+Run the following command for speed benchmark:
+
+``` bash
+python3 video_speed_benchmark.py <your-video-path>
+```
 
 ## Citation
 
