@@ -1,4 +1,4 @@
-# Stable Head Pose Estimation via 3D Dense Face Reconstruction
+# Stable Head Pose Estimation and Landmark Regression via 3D Dense Face Reconstruction
 
 ![FaceReconstructionDemo](https://s3.ax1x.com/2021/01/06/sZVyhq.gif)
 
