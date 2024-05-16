@@ -2,7 +2,6 @@
 
 ![FaceReconstructionDemo](https://s3.ax1x.com/2021/01/06/sZVyhq.gif)
 
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/1996scarlet/Dense-Head-Pose-Estimation.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/1996scarlet/Dense-Head-Pose-Estimation/context:python)
 [![License](https://badgen.net/github/license/1996scarlet/Dense-Head-Pose-Estimation)](LICENSE)
 [![ECCV](https://badgen.net/badge/ECCV/2020/red)](https://www.ecva.net/papers/eccv_2020/papers_ECCV/html/3162_ECCV_2020_paper.php)
 
