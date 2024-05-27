@@ -180,9 +180,12 @@ python3 video_speed_benchmark.py <your-video-path>
 
 ``` bibtex
 @inproceedings{guo2020towards,
-    title={Towards Fast, Accurate and Stable 3D Dense Face Alignment},
-    author={Guo, Jianzhu and Zhu, Xiangyu and Yang, Yang and Yang, Fan and Lei, Zhen and Li, Stan Z},
-    booktitle={Proceedings of the European Conference on Computer Vision (ECCV)},
-    year={2020}
+  title={Towards fast, accurate and stable 3d dense face alignment},
+  author={Guo, Jianzhu and Zhu, Xiangyu and Yang, Yang and
+          Yang, Fan and Lei, Zhen and Li, Stan Z},
+  booktitle={European Conference on Computer Vision},
+  pages={152--168},
+  year={2020},
+  organization={Springer}
 }
 ```
