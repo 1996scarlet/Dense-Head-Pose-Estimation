@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from .TFLiteFaceDetection import UltraLightFaceDetecion
+from .TFLiteFaceDetection import UltraLightFaceDetection
 from .TFLiteFaceAlignment import DenseFaceReconstruction, DepthFacialLandmarks
 from .CtypesMeshRender import TrianglesMeshRender
 

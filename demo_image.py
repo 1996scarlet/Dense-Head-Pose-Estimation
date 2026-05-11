@@ -6,7 +6,7 @@ import sys
 import cv2
 import service
 
-fd = service.UltraLightFaceDetecion("weights/RFB-320.tflite",
+fd = service.UltraLightFaceDetection("weights/RFB-320.tflite",
                                     conf_threshold=0.52)
 fa = service.DenseFaceReconstruction("weights/dense_face.tflite")
 mr = service.TrianglesMeshRender("asset/render.so", "asset/triangles.npy")

@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 
 
-class UltraLightFaceDetecion():
+class UltraLightFaceDetection():
     def __init__(self, filepath, input_size=(320, 240), conf_threshold=0.6,
                  center_variance=0.1, size_variance=0.2,
                  nms_max_output_size=200, nms_iou_threshold=0.3) -> None:
