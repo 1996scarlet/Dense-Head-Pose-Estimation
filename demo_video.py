@@ -7,7 +7,7 @@ import cv2
 
 
 def main(args, color=(224, 255, 255)):
-    fd = service.UltraLightFaceDetecion("weights/RFB-320.tflite",
+    fd = service.UltraLightFaceDetection("weights/RFB-320.tflite",
                                         conf_threshold=0.95)
 
     if args.mode in ["sparse", "pose"]:
